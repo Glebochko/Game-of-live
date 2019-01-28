@@ -34,6 +34,7 @@ class GameOfLive:
     def __init__(self):
         self.cellsize = 10
         self.iteration = 0
+        self.status = 0   # 0 - expectations; 1 - work; 2 - quit
 
 
     def createWindow(self, xmax, ymax, cellsize):
@@ -55,11 +56,6 @@ class GameOfLive:
         self.iterationLabel = Text(Point(self.width - 1 + self.iterationWidth / 2, self.iterationWidth / 2), self.iteration)
         self.window = GraphWin('Game of live', self.width + 1 + self.iterationWidth, self.hight + 1)
         
-    
-    def drawline(self, x1, y1, x2, y2):
-
-        Line(Point(x1, y1), Point(x2, y2)).draw(self.window)
- 
 
     def pause(self):
         message = Text(Point(self.width / 2, self.cellsize / 2), 'Click anywhere to quit.')
@@ -82,11 +78,10 @@ class GameOfLive:
         bg.draw(self.window)
 
 
-    def preStart(self):
-        message = Text(Point(self.width / 2, self.cellsize), 'Click anywhere to start.')
-        message.draw(self.window)
-        self.window.getMouse()
+    def drawline(self, x1, y1, x2, y2):
 
+        Line(Point(x1, y1), Point(x2, y2)).draw(self.window)
+ 
 
     def drawCells(self):
         x, y = 0, 0
@@ -140,6 +135,7 @@ class GameOfLive:
                     thisCell.oldx = thisCell.x
                     thisCell.oldy = thisCell.y
                     thisCell.oldtype = thisCell.type
+
         self.showInfo()
 
 
@@ -179,21 +175,24 @@ class GameOfLive:
                         if (shrimpAmount <= 1) | (shrimpAmount >= 4) :
                             self.field[i][j].type = 0
 
-                
-
-                    
-                
-        pass
-
         
     def worldLoop(self, sleeptime):
         while (True):  
-            self.iteration += 1
-            self.regulatePopulation()
-            self.drawField()
-            time.sleep(sleeptime)
+            if self.window.isOpen() :
+                self.iteration += 1
+                self.regulatePopulation()
+                self.drawField()
+                time.sleep(sleeptime)
+            else :
+                self.quit()
 
         self.pause()
+
+
+    def preStart(self):
+        message = Text(Point(self.width / 2, self.cellsize), 'Click anywhere to start.')
+        message.draw(self.window)
+        self.window.getMouse()
 
 
     def start(self, sleeptime):
@@ -201,13 +200,33 @@ class GameOfLive:
         self.windowClear()
         self.drawCells()
         self.firstDrawField()
+        self.status = 1
         self.worldLoop(sleeptime)
     
 
+    def quit(self):
+        self.status = 2
+        self.__del__()
+        print('-- Exit! --')
+        raise SystemExit(0)
+
+
+    def __del__(self):
+        if self.status == 2 :
+            self.window.close()
+
 def main():
     gol = GameOfLive()
-    gol.createWindow(10, 8, 30)
-    gol.start(0.2)
+
+    rows = 15
+    cols = 11
+    cellsize = 20
+    waitingTime  = 0.8
+
+    print('-- Create window --') 
+    gol.createWindow(rows, cols, cellsize)
+    print('-- Start Game of live! --')
+    gol.start(waitingTime)
 
 
 
