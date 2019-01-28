@@ -11,7 +11,14 @@ class cellObj:
         self.oldx = x
         self.oldy = y
         self.type = celltype
+        self.oldtype = celltype
+        self.setColor(bgColor)
 
+        p = Point(0, 0)
+        self.ghost = Polygon([p, p, p, p])
+
+    
+    def setColor(self, bgColor):
         if self.type == 0 :     # free cell
             self.color = bgColor
         elif self.type == 1 :   # fish
@@ -20,9 +27,6 @@ class cellObj:
             self.color = 'gray'
         elif self.type == 3 :   # shrimp
             self.color = 'pink'
-
-        p = Point(0, 0)
-        self.ghost = Polygon([p, p, p, p])
 
 
 
@@ -33,7 +37,7 @@ class GameOfLive:
 
 
     def createWindow(self, xmax, ymax, cellsize):
-        self.bgColor = color_rgb(230, 216, 181)
+        self.bgColor = 'white'#color_rgb(230, 216, 181)
         self.cellsize = cellsize
         self.iterationWidth = 30
         self.xmax = xmax
@@ -109,6 +113,8 @@ class GameOfLive:
     def drawCell(self, x, y, thisCell):
         dx = thisCell.x - thisCell.oldx
         dy = thisCell.y - thisCell.oldy
+        thisCell.setColor(self.bgColor)
+        thisCell.ghost.setFill(thisCell.color)
         thisCell.ghost.move(dx, dy)
 
 
@@ -134,16 +140,49 @@ class GameOfLive:
         for i in range(self.xmax):
             for j in range(self.ymax):
                 thisCell = self.field[i][j]
-                if (thisCell.oldx != thisCell.x) | (thisCell.oldy != thisCell.y) :
+                if (thisCell.oldtype != thisCell.type) | (thisCell.oldx != thisCell.x) | (thisCell.oldy != thisCell.y) :
                     self.drawCell(i, j, thisCell)
                     thisCell.oldx = thisCell.x
                     thisCell.oldy = thisCell.y
+                    thisCell.oldtype = thisCell.type
         self.showInfo()
 
 
+    def countNumberObjects(self, x, y, objtype):
+        return 0
+
+
+    def regulatePopulation(self):
+        for i in range(self.xmax):
+            for j in range(self.ymax):
+                fishAmount = self.countNumberObjects(i, j, 1)
+                shrimpAmount = self.countNumberObjects(i, j, 3)
+
+                if self.field[i][j].type == 0 :
+                    if fishAmount == 3 :
+                        self.field[i][j].type = 1
+                    elif shrimpAmount == 3 :
+                        self.field[i][j].type = 3
+
+                elif self.field[i][j].type == 1 :
+                    if (fishAmount <= 1) | (fishAmount >= 4) :
+                        self.field[i][j].type = 0
+
+                elif self.field[i][j].type == 3 :
+                    if (shrimpAmount <= 1) | (shrimpAmount >= 4) :
+                        self.field[i][j].type = 0
+
+                
+
+                    
+                
+        pass
+
+        
     def worldLoop(self, sleeptime):
         while (True):  
             self.iteration += 1
+            self.regulatePopulation()
             self.drawField()
             time.sleep(sleeptime)
 
@@ -160,7 +199,7 @@ class GameOfLive:
 
 def main():
     gol = GameOfLive()
-    gol.createWindow(20, 15, 20)
+    gol.createWindow(10, 8, 30)
     gol.start(0.2)
 
 
