@@ -149,18 +149,19 @@ class GameOfLive:
 
 
     def countNumberObjects(self, x, y, objtype):
-        amount = 0
+        objAmount = 0
         radius = 1
 
         for i in range(x - radius, x + radius + 1) :
             for j in range(y - radius, y + radius + 1) :
                 try :
-                    if self.field[i][j].type == objtype :
-                        amount += 1
+                    if (i, j) != (x, y): # don't take into account yourself
+                        if self.field[i][j].type == objtype :
+                            objAmount += 1
                 except :
                     pass
 
-        return amount
+        return objAmount
 
 
     def regulatePopulation(self):
@@ -169,17 +170,19 @@ class GameOfLive:
                 if self.field[i][j].type != 2 :
                     fishAmount = self.countNumberObjects(i, j, 1)
                     shrimpAmount = self.countNumberObjects(i, j, 3)
-
+                    # birth of fish or shrimp
                     if self.field[i][j].type == 0 :
                         if fishAmount == 3 :
                             self.field[i][j].type = 1
                         elif shrimpAmount == 3 :
                             self.field[i][j].type = 3
 
+                    # kill extra fish
                     elif self.field[i][j].type == 1 :
                         if (fishAmount <= 1) | (fishAmount >= 4) :
                             self.field[i][j].type = 0
 
+                    # kill extra shrimp
                     elif self.field[i][j].type == 3 :
                         if (shrimpAmount <= 1) | (shrimpAmount >= 4) :
                             self.field[i][j].type = 0
@@ -224,11 +227,13 @@ class GameOfLive:
         if self.status == 2 :
             self.window.close()
 
+
+
 def main():
     print('-- Tinkoff Fintech Task #9 --')
     print('-- Created by Skryabin Gleb --')
-    gol = GameOfLive()
 
+    gol = GameOfLive()
     rows = 15
     cols = 11
     cellsize = 20
@@ -236,6 +241,7 @@ def main():
 
     print('-- Create window --') 
     gol.createWindow(rows, cols, cellsize)
+
     print('-- Start Game of live! --')
     gol.start(waitingTime)
 
