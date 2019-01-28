@@ -79,8 +79,10 @@ class GameOfLive:
 
 
     def drawline(self, x1, y1, x2, y2):
-
-        Line(Point(x1, y1), Point(x2, y2)).draw(self.window)
+        if self.window.isOpen() :
+            Line(Point(x1, y1), Point(x2, y2)).draw(self.window)
+        else :
+            self.quit()
  
 
     def drawCells(self):
@@ -109,21 +111,28 @@ class GameOfLive:
 
 
     def firstDrawField(self):
-        for i in range(self.xmax):
-            for j in range(self.ymax):
-                thisCell = self.field[i][j]
-                p1 = Point(i * self.cellsize, j * self.cellsize)
-                p2 = Point((i + 1) * self.cellsize, j * self.cellsize)
-                p3 = Point((i + 1) * self.cellsize, (j + 1) * self.cellsize)
-                p4 = Point(i * self.cellsize, (j + 1) * self.cellsize)
+        if self.window.isOpen() :
+            self.iterationLabel.draw(self.window)
+            for i in range(self.xmax):
+                for j in range(self.ymax):
+                    thisCell = self.field[i][j]
+                    p1 = Point(i * self.cellsize, j * self.cellsize)
+                    p2 = Point((i + 1) * self.cellsize, j * self.cellsize)
+                    p3 = Point((i + 1) * self.cellsize, (j + 1) * self.cellsize)
+                    p4 = Point(i * self.cellsize, (j + 1) * self.cellsize)
 
-                verticles = [p1, p2, p3, p4]
-                newCell = Polygon(verticles)
-                thisCell.ghost = newCell
-                thisCell.ghost.setFill(thisCell.color)
-                thisCell.ghost.draw(self.window) 
+                    verticles = [p1, p2, p3, p4]
+                    newCell = Polygon(verticles)
+                    thisCell.ghost = newCell
+                    thisCell.ghost.setFill(thisCell.color)
 
-        self.iterationLabel.draw(self.window)
+                    if self.window.isOpen() :
+                        thisCell.ghost.draw(self.window) 
+                    else :
+                        self.quit()
+
+        else :
+            self.quit()
 
 
     def drawField(self):
@@ -216,6 +225,8 @@ class GameOfLive:
             self.window.close()
 
 def main():
+    print('-- Tinkoff Fintech Task #9 --')
+    print('-- Created by Skryabin Gleb --')
     gol = GameOfLive()
 
     rows = 15
