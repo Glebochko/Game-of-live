@@ -44,16 +44,11 @@ class GameOfLive:
         self.ymax = ymax
 
         self.field = []
-        for i in range(self.xmax + 1):
+        for i in range(self.xmax):
             self.field.append([])
-            for j in range(self.ymax + 1):
-                celltype = randrange(0, 4)
+            for j in range(self.ymax):
+                celltype = randrange(0, 3 + 1)
                 self.field[i].append(cellObj(i, j, celltype, self.bgColor))
-        
-        for i in range(self.xmax + 1):
-            self.field[i][self.ymax].type = 2
-        for j in range(self.ymax + 1):
-            self.field[self.xmax][j].type = 2 
 
         self.width = self.xmax * self.cellsize
         self.hight = self.ymax * self.cellsize
@@ -149,28 +144,40 @@ class GameOfLive:
 
 
     def countNumberObjects(self, x, y, objtype):
-        return 0
+        amount = 0
+        radius = 1
+
+        for i in range(x - radius, x + radius + 1) :
+            for j in range(y - radius, y + radius + 1) :
+                try :
+                    if self.field[i][j].type == objtype :
+                        amount += 1
+                except :
+                    pass
+
+        return amount
 
 
     def regulatePopulation(self):
         for i in range(self.xmax):
             for j in range(self.ymax):
-                fishAmount = self.countNumberObjects(i, j, 1)
-                shrimpAmount = self.countNumberObjects(i, j, 3)
+                if self.field[i][j].type != 2 :
+                    fishAmount = self.countNumberObjects(i, j, 1)
+                    shrimpAmount = self.countNumberObjects(i, j, 3)
 
-                if self.field[i][j].type == 0 :
-                    if fishAmount == 3 :
-                        self.field[i][j].type = 1
-                    elif shrimpAmount == 3 :
-                        self.field[i][j].type = 3
+                    if self.field[i][j].type == 0 :
+                        if fishAmount == 3 :
+                            self.field[i][j].type = 1
+                        elif shrimpAmount == 3 :
+                            self.field[i][j].type = 3
 
-                elif self.field[i][j].type == 1 :
-                    if (fishAmount <= 1) | (fishAmount >= 4) :
-                        self.field[i][j].type = 0
+                    elif self.field[i][j].type == 1 :
+                        if (fishAmount <= 1) | (fishAmount >= 4) :
+                            self.field[i][j].type = 0
 
-                elif self.field[i][j].type == 3 :
-                    if (shrimpAmount <= 1) | (shrimpAmount >= 4) :
-                        self.field[i][j].type = 0
+                    elif self.field[i][j].type == 3 :
+                        if (shrimpAmount <= 1) | (shrimpAmount >= 4) :
+                            self.field[i][j].type = 0
 
                 
 
